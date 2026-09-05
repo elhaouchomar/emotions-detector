@@ -44,7 +44,6 @@ Model: "sequential"
  Optimizer params: 255,888 (999.57 KB)
 
 
-
 Architecture notes
 ===================
 

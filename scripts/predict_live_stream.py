@@ -4,9 +4,8 @@ import os
 import time
 
 import cv2
-import numpy as np
 from tensorflow import keras
-from preprocess import EMOTIONS, FACE_CASCADE_PATH, IMG_SIZE, detect_and_crop_face, predict_emotion, BASE_DIR, draw_bounding_box_with_emotion
+from preprocess import FACE_CASCADE_PATH, detect_and_crop_face, predict_emotion, BASE_DIR, draw_bounding_box_with_emotion
 
 MODEL_PATH = os.path.join(BASE_DIR, "results/model/final_emotion_model.keras")
 
