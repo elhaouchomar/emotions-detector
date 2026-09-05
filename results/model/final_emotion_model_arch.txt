@@ -1,0 +1,66 @@
+Model: "sequential"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
+┃ Layer (type)                         ┃ Output Shape                ┃         Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━┩
+│ conv2d (Conv2D)                      │ (None, 48, 48, 32)          │             320 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ batch_normalization                  │ (None, 48, 48, 32)          │             128 │
+│ (BatchNormalization)                 │                             │                 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ max_pooling2d (MaxPooling2D)         │ (None, 24, 24, 32)          │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dropout (Dropout)                    │ (None, 24, 24, 32)          │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ conv2d_1 (Conv2D)                    │ (None, 24, 24, 64)          │          18,496 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ batch_normalization_1                │ (None, 24, 24, 64)          │             256 │
+│ (BatchNormalization)                 │                             │                 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ max_pooling2d_1 (MaxPooling2D)       │ (None, 12, 12, 64)          │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dropout_1 (Dropout)                  │ (None, 12, 12, 64)          │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ conv2d_2 (Conv2D)                    │ (None, 12, 12, 128)         │          73,856 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ batch_normalization_2                │ (None, 12, 12, 128)         │             512 │
+│ (BatchNormalization)                 │                             │                 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ max_pooling2d_2 (MaxPooling2D)       │ (None, 6, 6, 128)           │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dropout_2 (Dropout)                  │ (None, 6, 6, 128)           │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ global_average_pooling2d             │ (None, 128)                 │               0 │
+│ (GlobalAveragePooling2D)             │                             │                 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dense (Dense)                        │ (None, 256)                 │          33,024 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dropout_3 (Dropout)                  │ (None, 256)                 │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dense_1 (Dense)                      │ (None, 7)                   │           1,799 │
+└──────────────────────────────────────┴─────────────────────────────┴─────────────────┘
+ Total params: 384,279 (1.47 MB)
+ Trainable params: 127,943 (499.78 KB)
+ Non-trainable params: 448 (1.75 KB)
+ Optimizer params: 255,888 (999.57 KB)
+
+
+
+Architecture notes
+===================
+
+Iteration 1: single conv block (32 filters) + dense(128) -> ~48% val accuracy,
+             underfit, plateaued fast.
+Iteration 2: 2 conv blocks (32, 64) with BatchNorm + Dropout(0.25) after each
+             pool, dense(256) with Dropout(0.5) -> ~57% val accuracy, closed
+             most of the gap to overfitting but still underfit slightly.
+Iteration 3 (final): 3 conv blocks (32, 64, 128), BatchNorm + MaxPool +
+             Dropout(0.25) after each block, GlobalAveragePooling instead of
+             Flatten to cut parameter count, dense(256) + Dropout(0.5),
+             softmax(7). This gave the best validation accuracy while
+             keeping the train/val gap small. EarlyStopping (patience=8,
+             restore_best_weights=True) on val_loss stopped training before
+             overfitting set in; ModelCheckpoint kept the best epoch as a
+             safety net.
+
+Optimizer: Adam(lr=1e-3) with ReduceLROnPlateau(factor=0.5, patience=3) on
+val_loss to fine-tune once progress stalls.
