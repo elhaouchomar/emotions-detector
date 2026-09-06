@@ -32,8 +32,6 @@ def main():
     cap = open_capture(args.video)
     print("Reading video stream ...\n")
 
-    fps = cap.get(cv2.CAP_PROP_FPS) or 25
-    frame_interval = max(int(round(fps)), 1)
     frame_idx = 0
 
     try:
@@ -45,7 +43,7 @@ def main():
             if not ok:
                 break
 
-            if frame_idx % frame_interval == 0:
+            if True:
                 print("Preprocessing ...")
                 result = detect_and_crop_face(frame, face_cascade)
                 if result is not None:
@@ -54,8 +52,6 @@ def main():
                     print(f"{datetime.datetime.now().strftime('%H:%M:%S')}s : {latest_emotion}\n")
                 else:
                     latest_box, latest_emotion = None, ""
-                if not args.video:
-                    time.sleep(max(0, 1 - 0.0))
 
             draw_bounding_box_with_emotion(frame, latest_box, latest_emotion)
             
