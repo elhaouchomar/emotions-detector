@@ -1,7 +1,8 @@
-tensorflow
-keras
-opencv-python
-numpy
-pandas
-matplotlib
-scikit-learn
+tensorflow==2.21.0
+keras==3.12.4
+numpy==2.2.6
+pandas==2.3.3
+opencv-python==4.10.0.84
+scikit-learn==1.7.2
+matplotlib==3.10.9
+pillow==12.3.0
